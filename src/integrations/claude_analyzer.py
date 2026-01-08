@@ -21,6 +21,43 @@ class ClaudeAnalyzer:
         self.model = "claude-sonnet-4-5-20250929"
         logger.info("Claude analyzer initialized")
 
+    def _parse_json_response(self, response_text: str) -> dict:
+        """
+        Parse JSON from Claude response, handling markdown code blocks.
+
+        Args:
+            response_text: Raw response text from Claude
+
+        Returns:
+            Parsed JSON dictionary
+        """
+        import re
+
+        # Try to parse as-is first
+        try:
+            return json.loads(response_text)
+        except json.JSONDecodeError:
+            pass
+
+        # Try to extract JSON from markdown code blocks
+        json_match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', response_text, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(1))
+            except json.JSONDecodeError:
+                pass
+
+        # Try to find JSON object in the text
+        json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+        if json_match:
+            try:
+                return json.loads(json_match.group(0))
+            except json.JSONDecodeError:
+                pass
+
+        # If all parsing fails, raise the original error
+        raise json.JSONDecodeError(f"Could not parse JSON from response: {response_text[:200]}...", response_text, 0)
+
     def analyze_article(self, article: NewsArticle) -> NewsArticle:
         """
         Analyze article for relevance to healthcare/life sciences UX.
@@ -86,8 +123,8 @@ Focus on:
             # Extract the response text
             response_text = response.content[0].text
 
-            # Parse JSON response
-            analysis = json.loads(response_text)
+            # Parse JSON response - handle markdown code blocks
+            analysis = self._parse_json_response(response_text)
 
             # Update article with analysis results
             article.relevance_score = float(analysis.get("relevance_score", 0.0))
@@ -262,7 +299,7 @@ Focus on:
             )
 
             response_text = response.content[0].text
-            analysis = json.loads(response_text)
+            analysis = self._parse_json_response(response_text)
 
             # Update article with analysis results
             article.relevance_score = float(analysis.get("relevance_score", 0.0))
