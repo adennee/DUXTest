@@ -1,6 +1,5 @@
-// Configuration (loaded from config.js)
-const NOTION_API_KEY = CONFIG.NOTION_API_KEY;
-const NOTION_DATABASE_ID = CONFIG.NOTION_DATABASE_ID;
+// Configuration - now points to local API server instead of Notion directly
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // State
 let articles = [];
@@ -46,20 +45,9 @@ async function init() {
     }
 }
 
-// Load articles from Notion
+// Load articles from backend API
 async function loadArticles() {
-    const response = await fetch(`https://api.notion.com/v1/databases/${NOTION_DATABASE_ID}/query`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${NOTION_API_KEY}`,
-            'Notion-Version': '2022-06-28',
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            sorts: [{ property: 'Published', direction: 'descending' }],
-            page_size: 20
-        })
-    });
+    const response = await fetch(`${API_BASE_URL}/articles`);
 
     if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -67,14 +55,11 @@ async function loadArticles() {
 
     const data = await response.json();
 
-    articles = data.results.map(page => ({
-        id: page.id,
-        title: page.properties.Title?.title?.[0]?.plain_text || 'Untitled',
-        source: page.properties.Source?.rich_text?.[0]?.plain_text || '',
-        tags: page.properties.Tags?.multi_select?.map(t => t.name) || [],
-        score: page.properties['Relevance Score']?.number || 0,
-        url: page.properties.URL?.url || ''
-    }));
+    if (data.error) {
+        throw new Error(data.error);
+    }
+
+    articles = data.articles;
 
     // Load content for each article
     for (let article of articles) {
@@ -86,30 +71,19 @@ async function loadArticles() {
 
 // Load article content blocks
 async function loadArticleContent(pageId) {
-    const response = await fetch(`https://api.notion.com/v1/blocks/${pageId}/children`, {
-        headers: {
-            'Authorization': `Bearer ${NOTION_API_KEY}`,
-            'Notion-Version': '2022-06-28'
-        }
-    });
+    const response = await fetch(`${API_BASE_URL}/article/${pageId}`);
 
-    const data = await response.json();
-    let content = [];
-
-    for (let block of data.results) {
-        if (block.type === 'heading_2') {
-            const text = block.heading_2?.rich_text?.[0]?.plain_text;
-            if (text) content.push({ type: 'heading', text });
-        } else if (block.type === 'paragraph') {
-            const text = block.paragraph?.rich_text?.[0]?.plain_text;
-            if (text && text.trim()) content.push({ type: 'text', text });
-        } else if (block.type === 'callout') {
-            const text = block.callout?.rich_text?.[0]?.plain_text;
-            if (text) content.push({ type: 'callout', text });
-        }
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
     }
 
-    return content;
+    const data = await response.json();
+
+    if (data.error) {
+        throw new Error(data.error);
+    }
+
+    return data.content;
 }
 
 // Load an article
