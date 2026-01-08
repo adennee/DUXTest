@@ -4,6 +4,10 @@ notion-client>=2.2.1
 requests>=2.31.0
 python-dotenv>=1.0.0
 
+# Web server for audio player
+flask>=3.0.0
+flask-cors>=4.0.0
+
 # Web scraping and RSS parsing
 beautifulsoup4>=4.12.0
 feedparser>=6.0.0
