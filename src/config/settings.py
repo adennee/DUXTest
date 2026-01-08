@@ -23,6 +23,10 @@ class Settings(BaseSettings):
     # Logging
     log_level: str = Field("INFO", alias="LOG_LEVEL")
 
+    # News API Rate Limiting (conserve free tier: 100 requests/day)
+    max_search_keywords: int = Field(3, alias="MAX_SEARCH_KEYWORDS")
+    max_competitor_companies: int = Field(6, alias="MAX_COMPETITOR_COMPANIES")
+
     # News Sources Configuration
     rss_feeds: List[str] = Field(default_factory=lambda: [
         "https://www.healthcareitnews.com/rss.xml",

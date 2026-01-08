@@ -134,7 +134,11 @@ class HealthcareNewsAgent:
         # Collect from web search (if API key available)
         try:
             if self.settings.news_api_key:
-                web_articles = self.web_scraper.search_all_keywords(days_back)
+                web_articles = self.web_scraper.search_all_keywords(
+                    days_back,
+                    max_per_keyword=3,
+                    max_keywords=self.settings.max_search_keywords
+                )
                 articles.extend(web_articles)
                 logger.info(f"Collected {len(web_articles)} articles from web search")
         except Exception as e:
@@ -166,7 +170,10 @@ class HealthcareNewsAgent:
         releases = []
 
         try:
-            releases = self.release_scraper.scrape_all_companies(days_back)
+            releases = self.release_scraper.scrape_all_companies(
+                days_back,
+                max_companies=self.settings.max_competitor_companies
+            )
             logger.info(f"Collected {len(releases)} product releases")
         except Exception as e:
             logger.error(f"Error collecting releases: {e}")
