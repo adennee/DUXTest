@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iOS Setup Instructions</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #667eea; }
+        .step {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .icon {
+            font-size: 24px;
+            margin: 0 5px;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 14px;
+        }
+        .tip {
+            background: #e7f3ff;
+            border-left: 4px solid #2563eb;
+            padding: 12px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎧 Using on iPhone/iPad</h1>
+
+    <h2>Option 1: Open in Safari (Easiest)</h2>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <strong>Share the URL to yourself</strong><br>
+        On your Mac, run:
+        <code>python3 -m http.server 8000</code><br>
+        Then text yourself: <code>http://YOUR-MAC-IP:8000</code>
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <strong>Open link in Safari on iPhone</strong><br>
+        Tap the link you sent yourself
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <strong>Start listening!</strong><br>
+        Tap the play button <span class="icon">▶️</span>
+    </div>
+
+    <h2>Option 2: Add to Home Screen (Best Experience)</h2>
+
+    <div class="step">
+        <span class="step-number">1</span>
+        <strong>Open in Safari</strong><br>
+        Follow steps above to open the player
+    </div>
+
+    <div class="step">
+        <span class="step-number">2</span>
+        <strong>Tap Share button</strong><br>
+        Tap <span class="icon">⬆️</span> at the bottom of Safari
+    </div>
+
+    <div class="step">
+        <span class="step-number">3</span>
+        <strong>Select "Add to Home Screen"</strong><br>
+        Scroll down and tap "Add to Home Screen"
+    </div>
+
+    <div class="step">
+        <span class="step-number">4</span>
+        <strong>Name it and Add</strong><br>
+        Change name to "UX News" (or whatever you like) and tap "Add"
+    </div>
+
+    <div class="step">
+        <span class="step-number">5</span>
+        <strong>Launch from home screen</strong><br>
+        Now it works like a real app! Opens in full screen without Safari bars.
+    </div>
+
+    <h2>Option 3: Host Online (Access Anywhere)</h2>
+
+    <div class="step">
+        <strong>Deploy to Netlify (Free):</strong>
+        <ol>
+            <li>Create account at <a href="https://netlify.com">netlify.com</a></li>
+            <li>Drag the <code>audio_player</code> folder to Netlify</li>
+            <li>Get a URL like: <code>https://ux-news.netlify.app</code></li>
+            <li>Access from anywhere!</li>
+        </ol>
+    </div>
+
+    <h2>iPhone Features</h2>
+
+    <div class="tip">
+        <strong>✅ Works great on iPhone:</strong>
+        <ul>
+            <li>Uses iOS system voices (high quality)</li>
+            <li>Touch controls optimized for mobile</li>
+            <li>Responsive design fits any screen</li>
+            <li>Works in background (keep screen off)</li>
+            <li>Lock screen controls appear automatically</li>
+        </ul>
+    </div>
+
+    <h2>iPhone Tips</h2>
+
+    <div class="tip">
+        <strong>🎯 Best practices:</strong>
+        <ul>
+            <li><strong>Use Safari</strong> - Chrome doesn't have speech synthesis on iOS</li>
+            <li><strong>Keep volume up</strong> - Check ringer/media volume</li>
+            <li><strong>First tap</strong> - iOS requires user gesture for first play</li>
+            <li><strong>Background play</strong> - Works with screen locked!</li>
+            <li><strong>AirPods</strong> - Connect before playing for best quality</li>
+        </ul>
+    </div>
+
+    <h2>Finding Your Mac's IP Address</h2>
+
+    <div class="step">
+        <strong>On Mac:</strong><br>
+        System Settings → Network → Wi-Fi → Details<br>
+        Look for "IP Address": Usually like <code>192.168.1.x</code>
+    </div>
+
+    <h2>Troubleshooting</h2>
+
+    <div class="tip">
+        <strong>No sound?</strong>
+        <ul>
+            <li>Check ringer switch on side of iPhone</li>
+            <li>Turn up volume with buttons</li>
+            <li>Tap play button twice</li>
+            <li>Force close Safari and reopen</li>
+        </ul>
+
+        <strong>Won't load?</strong>
+        <ul>
+            <li>Make sure iPhone and Mac on same Wi-Fi</li>
+            <li>Check Mac firewall isn't blocking port 8000</li>
+            <li>Try typing IP address manually in Safari</li>
+        </ul>
+
+        <strong>Choppy playback?</strong>
+        <ul>
+            <li>Close other apps</li>
+            <li>Move closer to Wi-Fi router</li>
+            <li>Consider hosting online instead</li>
+        </ul>
+    </div>
+
+    <h2>Alternative: Use iOS Shortcuts</h2>
+
+    <p>Create a Siri Shortcut to open your player:</p>
+    <ol>
+        <li>Open Shortcuts app on iPhone</li>
+        <li>Create new shortcut</li>
+        <li>Add "Open URL" action</li>
+        <li>Enter your player URL</li>
+        <li>Say "Hey Siri, play UX news"</li>
+    </ol>
+
+    <hr style="margin: 40px 0;">
+
+    <p style="text-align: center; color: #666;">
+        Questions? The player should work perfectly on iPhone!<br>
+        Best voices are on iOS Safari. Enjoy! 🎧
+    </p>
+</body>
+</html>
