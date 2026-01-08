@@ -10,6 +10,7 @@ from ..integrations.notion_client import NotionClient
 from ..integrations.claude_analyzer import ClaudeAnalyzer
 from ..scrapers.rss_scraper import RSSFeedScraper
 from ..scrapers.web_scraper import WebSearchScraper
+from ..scrapers.company_release_scraper import CompanyReleaseScraper
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,7 @@ class HealthcareNewsAgent:
         self.analyzer = ClaudeAnalyzer()
         self.rss_scraper = RSSFeedScraper(self.settings.rss_feeds)
         self.web_scraper = WebSearchScraper()
+        self.release_scraper = CompanyReleaseScraper()
 
         logger.info("Healthcare News Agent initialized")
 
@@ -44,8 +46,10 @@ class HealthcareNewsAgent:
         stats = {
             "start_time": datetime.now().isoformat(),
             "articles_collected": 0,
+            "releases_collected": 0,
             "articles_analyzed": 0,
             "articles_published": 0,
+            "releases_published": 0,
             "errors": []
         }
 
@@ -56,33 +60,46 @@ class HealthcareNewsAgent:
             stats["articles_collected"] = len(articles)
             logger.info(f"Collected {len(articles)} articles")
 
-            if not articles:
-                logger.warning("No articles collected, exiting")
+            # Step 2: Collect product releases from competitors (look back 14 days for releases)
+            logger.info("Step 2: Collecting product releases from competitors")
+            releases = self._collect_releases(days_back * 2)  # Look back longer for releases
+            stats["releases_collected"] = len(releases)
+            logger.info(f"Collected {len(releases)} product releases")
+
+            # Combine articles and releases
+            all_content = articles + releases
+
+            if not all_content:
+                logger.warning("No content collected, exiting")
                 return stats
 
-            # Step 2: Analyze articles with Claude
-            logger.info("Step 2: Analyzing articles for relevance")
-            analyzed_articles = self._analyze_articles(articles)
-            stats["articles_analyzed"] = len(analyzed_articles)
+            # Step 3: Analyze all content with Claude
+            logger.info("Step 3: Analyzing content for relevance")
+            analyzed_content = self._analyze_articles(all_content)
+            stats["articles_analyzed"] = len(analyzed_content)
 
-            # Step 3: Filter by relevance score
-            logger.info("Step 3: Filtering by relevance score")
-            relevant_articles = self._filter_relevant(analyzed_articles)
-            logger.info(f"Found {len(relevant_articles)} relevant articles")
+            # Step 4: Filter by relevance score
+            logger.info("Step 4: Filtering by relevance score")
+            relevant_content = self._filter_relevant(analyzed_content)
+            logger.info(f"Found {len(relevant_content)} relevant items")
 
-            # Step 4: Limit to max articles
-            limited_articles = relevant_articles[:self.settings.max_articles_per_run]
-            logger.info(f"Limited to top {len(limited_articles)} articles")
+            # Step 5: Limit to max articles
+            limited_content = relevant_content[:self.settings.max_articles_per_run]
+            logger.info(f"Limited to top {len(limited_content)} items")
 
-            # Step 5: Publish to Notion
-            logger.info("Step 5: Publishing to Notion")
-            published_count = self._publish_to_notion(limited_articles)
-            stats["articles_published"] = published_count
+            # Step 6: Publish to Notion
+            logger.info("Step 6: Publishing to Notion")
+            published_count = self._publish_to_notion(limited_content)
 
-            # Generate digest if we published articles
+            # Count releases vs articles
+            releases_published = sum(1 for item in limited_content if item.is_product_release())
+            stats["articles_published"] = published_count - releases_published
+            stats["releases_published"] = releases_published
+
+            # Generate digest if we published items
             if published_count > 0:
                 logger.info("Generating executive digest")
-                digest = self.analyzer.create_digest(limited_articles)
+                digest = self.analyzer.create_digest(limited_content)
                 logger.info("Digest created (not published separately)")
 
         except Exception as e:
@@ -136,6 +153,26 @@ class HealthcareNewsAgent:
         logger.info(f"Deduplicated to {len(unique_articles)} unique articles")
         return unique_articles
 
+    def _collect_releases(self, days_back: int) -> List[NewsArticle]:
+        """
+        Collect product releases from competitor companies.
+
+        Args:
+            days_back: Number of days to look back
+
+        Returns:
+            List of collected releases
+        """
+        releases = []
+
+        try:
+            releases = self.release_scraper.scrape_all_companies(days_back)
+            logger.info(f"Collected {len(releases)} product releases")
+        except Exception as e:
+            logger.error(f"Error collecting releases: {e}")
+
+        return releases
+
     def _analyze_articles(self, articles: List[NewsArticle]) -> List[NewsArticle]:
         """
         Analyze articles with Claude for relevance and insights.
@@ -160,8 +197,11 @@ class HealthcareNewsAgent:
                 if not article.summary and article.content:
                     article.summary = self.analyzer.generate_summary(article)
 
-                # Analyze for relevance
-                article = self.analyzer.analyze_article(article)
+                # Analyze for relevance (use release-specific analysis if applicable)
+                if article.is_product_release():
+                    article = self.analyzer.analyze_product_release(article)
+                else:
+                    article = self.analyzer.analyze_article(article)
 
                 analyzed.append(article)
 

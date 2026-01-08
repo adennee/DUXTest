@@ -26,6 +26,10 @@ class NewsArticle(BaseModel):
             HttpUrl: lambda v: str(v),
         }
 
+    def is_product_release(self) -> bool:
+        """Check if this article is a product release."""
+        return "Product Release" in self.tags
+
     def to_notion_properties(self) -> dict:
         """Convert article to Notion page properties format."""
         return {
@@ -67,6 +71,21 @@ class NewsArticle(BaseModel):
         """Convert article to Notion page content blocks."""
         blocks = []
 
+        # Add product release badge if applicable
+        if self.is_product_release():
+            blocks.append({
+                "object": "block",
+                "type": "callout",
+                "callout": {
+                    "rich_text": [{
+                        "type": "text",
+                        "text": {"content": f"🚀 Product Release from {self.source}"}
+                    }],
+                    "icon": {"emoji": "🚀"},
+                    "color": "blue_background"
+                }
+            })
+
         # Add summary if available
         if self.summary:
             blocks.append({
@@ -84,30 +103,14 @@ class NewsArticle(BaseModel):
                 }
             })
 
-        # Add key insights
-        if self.key_insights:
-            blocks.append({
-                "object": "block",
-                "type": "heading_2",
-                "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "Key Insights for UX"}}]
-                }
-            })
-            blocks.append({
-                "object": "block",
-                "type": "paragraph",
-                "paragraph": {
-                    "rich_text": [{"type": "text", "text": {"content": self.key_insights[:2000]}}]
-                }
-            })
-
-        # Add relevance reasoning
+        # Add relevance reasoning (for releases, this is "what was released")
         if self.relevance_reasoning:
+            heading_text = "What Was Released" if self.is_product_release() else "Why This Matters"
             blocks.append({
                 "object": "block",
                 "type": "heading_2",
                 "heading_2": {
-                    "rich_text": [{"type": "text", "text": {"content": "Why This Matters"}}]
+                    "rich_text": [{"type": "text", "text": {"content": heading_text}}]
                 }
             })
             blocks.append({
@@ -115,6 +118,24 @@ class NewsArticle(BaseModel):
                 "type": "paragraph",
                 "paragraph": {
                     "rich_text": [{"type": "text", "text": {"content": self.relevance_reasoning[:2000]}}]
+                }
+            })
+
+        # Add key insights (for releases, this is "UX implications")
+        if self.key_insights:
+            heading_text = "UX Implications & Competitive Insights" if self.is_product_release() else "Key Insights for UX"
+            blocks.append({
+                "object": "block",
+                "type": "heading_2",
+                "heading_2": {
+                    "rich_text": [{"type": "text", "text": {"content": heading_text}}]
+                }
+            })
+            blocks.append({
+                "object": "block",
+                "type": "paragraph",
+                "paragraph": {
+                    "rich_text": [{"type": "text", "text": {"content": self.key_insights[:2000]}}]
                 }
             })
 

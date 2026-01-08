@@ -39,8 +39,10 @@ def run_once(days_back: int = 7):
     print("HEALTHCARE UX NEWS AGENT - RUN SUMMARY")
     print("="*60)
     print(f"Articles collected: {stats['articles_collected']}")
-    print(f"Articles analyzed: {stats['articles_analyzed']}")
+    print(f"Product releases collected: {stats['releases_collected']}")
+    print(f"Total items analyzed: {stats['articles_analyzed']}")
     print(f"Articles published: {stats['articles_published']}")
+    print(f"Product releases published: {stats['releases_published']}")
 
     if stats.get('errors'):
         print(f"\nErrors encountered: {len(stats['errors'])}")

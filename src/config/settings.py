@@ -46,6 +46,40 @@ class Settings(BaseSettings):
         "life sciences UX",
     ])
 
+    # Competitor Companies to Track
+    competitor_companies: List[dict] = Field(default_factory=lambda: [
+        # Tech Giants
+        {"name": "Google", "aliases": ["Google Cloud", "Google Health"], "blog_url": "https://cloud.google.com/blog/products/healthcare-life-sciences"},
+        {"name": "Microsoft", "aliases": ["Microsoft Cloud", "Microsoft Healthcare"], "blog_url": "https://www.microsoft.com/en-us/industry/blog/healthcare/"},
+        {"name": "IBM", "aliases": ["IBM Watson Health", "IBM Cloud"], "blog_url": "https://www.ibm.com/blog/"},
+        {"name": "SAP", "aliases": ["SAP Health"], "blog_url": "https://www.sap.com/industries/life-sciences.html"},
+        {"name": "Salesforce", "aliases": ["Salesforce Health Cloud"], "blog_url": "https://www.salesforce.com/blog/"},
+        {"name": "AWS", "aliases": ["Amazon Web Services", "AWS Health"], "blog_url": "https://aws.amazon.com/blogs/industries/healthcare/"},
+        # Healthcare/Life Sciences Firms
+        {"name": "Epic", "aliases": ["Epic Systems"], "blog_url": "https://www.epic.com/"},
+        {"name": "Veeva Systems", "aliases": ["Veeva"], "blog_url": "https://www.veeva.com/resources/"},
+        {"name": "Medidata", "aliases": ["Medidata Solutions", "Dassault Systèmes Medidata"], "blog_url": "https://www.medidata.com/en/"},
+        {"name": "Qlik", "aliases": ["Qlik Healthcare"], "blog_url": "https://www.qlik.com/us/solutions/industries/healthcare"},
+        {"name": "Informatica", "aliases": [], "blog_url": "https://www.informatica.com/industries/healthcare.html"},
+        {"name": "Philips", "aliases": ["Philips Healthcare", "Royal Philips"], "blog_url": "https://www.philips.com/a-w/about/news/"},
+    ])
+
+    # Release Tracking Keywords
+    release_keywords: List[str] = Field(default_factory=lambda: [
+        "announces",
+        "launches",
+        "releases",
+        "introduces",
+        "unveils",
+        "new feature",
+        "new product",
+        "update",
+        "available now",
+        "general availability",
+        "beta",
+        "preview",
+    ])
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

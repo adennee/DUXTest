@@ -7,9 +7,11 @@ An intelligent agent that automatically collects, analyzes, and curates relevant
 This agent helps Senior UX leaders stay informed about the latest trends, research, and best practices in healthcare and life sciences user experience design. It:
 
 - 🔍 **Collects** news from curated RSS feeds and web sources
+- 🚀 **Tracks** product releases from major competitors (Google, Microsoft, AWS, Epic, Veeva, etc.)
 - 🤖 **Analyzes** content using Claude AI to determine relevance to healthcare UX
 - 📊 **Scores** articles based on their value for UX professionals
 - 📝 **Extracts** key insights and actionable takeaways
+- 🎯 **Identifies** competitive intelligence and UX implications
 - 📚 **Publishes** to Notion in a clean, readable format
 - ⏰ **Runs** automatically on a schedule you define
 
@@ -18,6 +20,9 @@ This agent helps Senior UX leaders stay informed about the latest trends, resear
 ### Content Sources
 - Healthcare IT news (HealthcareITNews, MobiHealthNews, HealthTech Magazine)
 - UX design publications (Nielsen Norman Group, UX Matters)
+- **Competitor product releases** from:
+  - **Tech Giants**: Google, Microsoft, IBM, SAP, Salesforce, AWS
+  - **Healthcare/Life Sciences**: Epic, Veeva Systems, Medidata, Qlik, Informatica, Philips
 - Keyword-based search for emerging topics
 - Configurable RSS feeds and search terms
 
@@ -25,13 +30,17 @@ This agent helps Senior UX leaders stay informed about the latest trends, resear
 - Relevance scoring (0.0-1.0) using Claude AI
 - Automatic summarization for quick reading
 - Key insights extraction for UX professionals
+- **Specialized analysis for product releases** with competitive insights
 - Context-aware tagging and categorization
+- UX implications analysis for competitor features
 
 ### Notion Integration
 - Clean, structured article pages
-- Rich metadata (source, date, relevance score)
+- **Visual badges for product releases** (🚀)
+- Rich metadata (source, date, relevance score, tags)
 - Direct links to original articles
 - Optimized for reading or text-to-speech
+- Separate sections for "What Was Released" and "UX Implications"
 
 ## Quick Start
 

@@ -200,3 +200,93 @@ Format as:
         except Exception as e:
             logger.error(f"Error creating digest: {e}")
             return "Failed to create digest."
+
+    def analyze_product_release(self, article: NewsArticle) -> NewsArticle:
+        """
+        Analyze a product release announcement specifically for UX implications.
+
+        Args:
+            article: NewsArticle containing a product release
+
+        Returns:
+            Updated NewsArticle with release-specific analysis
+        """
+        content_to_analyze = f"""
+Title: {article.title}
+Company: {article.source}
+Published: {article.published_date}
+URL: {article.url}
+
+Content:
+{article.content or article.summary or "No content available"}
+"""
+
+        prompt = f"""You are an expert in UX design for healthcare and life sciences. Analyze this product release announcement from a competitor and provide:
+
+1. A relevance score (0.0 to 1.0) for how important this is for a UX leader to know about
+2. Brief summary of what was released (1-2 sentences)
+3. UX implications and competitive insights for Oracle's UX team (2-3 bullet points)
+4. Appropriate tags/categories (up to 5)
+
+Product Release:
+{content_to_analyze}
+
+Respond in JSON format:
+{{
+    "relevance_score": 0.0-1.0,
+    "relevance_reasoning": "brief summary of what was released",
+    "key_insights": "UX implications and competitive insights as bullet points",
+    "tags": ["tag1", "tag2", "tag3"]
+}}
+
+Focus on:
+- New features or capabilities announced
+- UX/UI improvements or innovations
+- Healthcare/life sciences specific functionality
+- Patient or clinician-facing features
+- Workflow or integration enhancements
+- Accessibility or compliance features
+- Technology trends or approaches
+- Competitive positioning implications"""
+
+        try:
+            response = self.client.messages.create(
+                model=self.model,
+                max_tokens=2000,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ]
+            )
+
+            response_text = response.content[0].text
+            analysis = json.loads(response_text)
+
+            # Update article with analysis results
+            article.relevance_score = float(analysis.get("relevance_score", 0.0))
+            article.relevance_reasoning = analysis.get("relevance_reasoning", "")
+            article.key_insights = analysis.get("key_insights", "")
+
+            # Ensure "Product Release" tag is included
+            tags = analysis.get("tags", [])
+            if "Product Release" not in tags:
+                tags.insert(0, "Product Release")
+            article.tags = tags
+
+            logger.info(f"Analyzed release '{article.title}': relevance={article.relevance_score}")
+
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse Claude response as JSON: {e}")
+            article.relevance_score = 0.0
+            article.relevance_reasoning = "Failed to analyze"
+            article.tags = ["Product Release", article.source]
+
+        except Exception as e:
+            logger.error(f"Error analyzing product release with Claude: {e}")
+            article.relevance_score = 0.0
+            article.relevance_reasoning = "Analysis error"
+            article.tags = ["Product Release", article.source]
+
+        return article
