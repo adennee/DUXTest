@@ -1,3 +1,6 @@
+# Audio player config
+audio_player/config.js
+
 # Python
 __pycache__/
 *.py[cod]
