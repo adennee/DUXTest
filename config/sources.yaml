@@ -1,0 +1,64 @@
+# Healthcare UX News Sources Configuration
+# Add or remove sources here and restart the agent
+
+rss_feeds:
+  # Healthcare IT News
+  - url: https://www.healthcareitnews.com/rss.xml
+    name: Healthcare IT News
+    enabled: true
+
+  - url: https://www.mobihealthnews.com/rss.xml
+    name: MobiHealth News
+    enabled: true
+
+  - url: https://healthtechmagazine.net/rss.xml
+    name: HealthTech Magazine
+    enabled: true
+
+  # UX Design Publications
+  - url: https://www.nngroup.com/feed/rss/
+    name: Nielsen Norman Group
+    enabled: true
+
+  - url: https://www.uxmatters.com/index.xml
+    name: UX Matters
+    enabled: true
+
+  # Medical Device Design
+  - url: https://www.medicaldesignandoutsourcing.com/feed/
+    name: Medical Design & Outsourcing
+    enabled: true
+
+  # Add your custom feeds here
+  # - url: https://example.com/feed.xml
+  #   name: Custom Feed
+  #   enabled: true
+
+search_keywords:
+  # Core UX + Healthcare
+  - healthcare UX
+  - medical device design
+  - patient experience
+  - health app usability
+  - clinical workflow design
+
+  # Specific Technologies
+  - EHR user interface
+  - telemedicine UX
+  - healthcare accessibility
+  - medical user research
+
+  # Life Sciences
+  - life sciences UX
+  - pharmaceutical design
+  - clinical trial software
+  - laboratory interface design
+
+  # Emerging Topics
+  - AI in healthcare UX
+  - wearable health devices
+  - patient portal design
+  - digital therapeutics UX
+
+  # Add your custom keywords here
+  # - your custom keyword
