@@ -25,12 +25,13 @@ class CompanyReleaseScraper:
         self.news_api_key = settings.news_api_key
         logger.info(f"Initialized company release scraper for {len(self.companies)} companies")
 
-    def scrape_all_companies(self, days_back: int = 14) -> List[NewsArticle]:
+    def scrape_all_companies(self, days_back: int = 14, max_companies: int = 6) -> List[NewsArticle]:
         """
-        Scrape releases from all tracked companies.
+        Scrape releases from tracked companies.
 
         Args:
             days_back: Number of days to look back (default: 14 for releases)
+            max_companies: Maximum number of companies to check (default: 6 to conserve API calls)
 
         Returns:
             List of NewsArticle objects containing product releases
@@ -38,7 +39,11 @@ class CompanyReleaseScraper:
         all_releases = []
         seen_urls = set()
 
-        for company in self.companies:
+        # Limit to first N companies to conserve API calls
+        limited_companies = self.companies[:max_companies]
+        logger.info(f"Checking {len(limited_companies)} companies (limited from {len(self.companies)} to conserve API calls)")
+
+        for company in limited_companies:
             try:
                 logger.info(f"Checking releases for {company['name']}")
                 releases = self._scrape_company(company, days_back)
@@ -102,9 +107,9 @@ class CompanyReleaseScraper:
             # Build search query with company name and release keywords
             company_names = [company['name']] + company.get('aliases', [])
 
-            # Search for each release keyword
-            for keyword in ['launches', 'announces', 'releases']:
-                for name in company_names[:2]:  # Limit to avoid too many queries
+            # Search for just one keyword per company to conserve API calls
+            for keyword in ['launches']:  # Reduced from 3 keywords to 1
+                for name in company_names[:1]:  # Reduced from 2 names to 1
                     query = f'"{name}" {keyword} healthcare OR "life sciences"'
 
                     # Calculate date range

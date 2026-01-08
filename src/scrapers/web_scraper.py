@@ -44,13 +44,14 @@ class WebSearchScraper:
 
         return articles
 
-    def search_all_keywords(self, days_back: int = 7, max_per_keyword: int = 5) -> List[NewsArticle]:
+    def search_all_keywords(self, days_back: int = 7, max_per_keyword: int = 3, max_keywords: int = 3) -> List[NewsArticle]:
         """
-        Search for articles matching all configured keywords.
+        Search for articles matching configured keywords.
 
         Args:
             days_back: Only include articles from the last N days
-            max_per_keyword: Maximum articles per keyword
+            max_per_keyword: Maximum articles per keyword (default: 3)
+            max_keywords: Maximum number of keywords to search (default: 3)
 
         Returns:
             List of all NewsArticle objects
@@ -58,7 +59,11 @@ class WebSearchScraper:
         all_articles = []
         seen_urls = set()
 
-        for keyword in self.keywords:
+        # Limit to first N keywords to conserve API calls
+        limited_keywords = self.keywords[:max_keywords]
+        logger.info(f"Searching {len(limited_keywords)} keywords (limited from {len(self.keywords)} to conserve API calls)")
+
+        for keyword in limited_keywords:
             articles = self.search_by_keyword(keyword, days_back)
 
             # Deduplicate by URL
